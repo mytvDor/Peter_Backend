@@ -17,7 +17,6 @@ const register = async (req, res) => {
     });
     await token.save();
 
-    // Send email with verification link
     const transporter = nodemailer.createTransport({
       service: 'hotmail',
       auth: {
@@ -87,7 +86,6 @@ const forgotPassword = async (req, res) => {
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send email with reset link
     const transporter = nodemailer.createTransport({
       service: 'hotmail',
       auth: {
