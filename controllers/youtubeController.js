@@ -2,7 +2,6 @@ const YouTubeUrl = require('../models/YouTubeUrl');
 
 const getAllYouTubeUrls = async (req, res) => {
     try {
-        console.log("hi i am here")
       const youtubeUrls = await YouTubeUrl.find();
       res.status(200).json(youtubeUrls);
     } catch (error) {
