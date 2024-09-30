@@ -9,17 +9,37 @@ const getAllYouTubeUrls = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
-const createYouTubeUrl = async (req, res) => {
-  const { url } = req.body;
+// const createYouTubeUrl = async (req, res) => {
+//   const { url } = req.body;
 
-  if (!url) {
-    return res.status(400).json({ message: 'YouTube URL is required' });
+//   if (!url) {
+//     return res.status(400).json({ message: 'YouTube URL is required' });
+//   }
+
+//   try {
+//     const newUrl = new YouTubeUrl({
+//       email: req.body.email, 
+//       url,
+//     });
+//     await newUrl.save();
+//     res.status(201).json(newUrl);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// };
+const createYouTubeUrl = async (req, res) => {
+  const { url, title, description } = req.body;
+
+  if (!url || !title || !description) {
+    return res.status(400).json({ message: 'YouTube URL, title, and description are required' });
   }
 
   try {
     const newUrl = new YouTubeUrl({
       email: req.body.email, 
       url,
+      title,
+      description
     });
     await newUrl.save();
     res.status(201).json(newUrl);
@@ -27,6 +47,7 @@ const createYouTubeUrl = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 const getUserYouTubeUrls = async (req, res) => {
   try {
@@ -37,18 +58,42 @@ const getUserYouTubeUrls = async (req, res) => {
   }
 };
 
+// const updateYouTubeUrl = async (req, res) => {
+//   const { id } = req.params;
+//   const { url } = req.body;
+
+//   if (!url) {
+//     return res.status(400).json({ message: 'YouTube URL is required' });
+//   }
+
+//   try {
+//     const updatedUrl = await YouTubeUrl.findOneAndUpdate(
+//       { _id: id, email: req.body.email }, 
+//       { url },
+//       { new: true }
+//     );
+
+//     if (!updatedUrl) {
+//       return res.status(404).json({ message: 'YouTube URL not found or unauthorized' });
+//     }
+
+//     res.json(updatedUrl);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// };
 const updateYouTubeUrl = async (req, res) => {
   const { id } = req.params;
-  const { url } = req.body;
-
-  if (!url) {
-    return res.status(400).json({ message: 'YouTube URL is required' });
+  const { url, title, description } = req.body;
+console.log(req.body)
+  if (!url || !title || !description) {
+    return res.status(400).json({ message: 'YouTube URL, title, and description are required' });
   }
 
   try {
     const updatedUrl = await YouTubeUrl.findOneAndUpdate(
-      { _id: id, email: req.body.email }, 
-      { url },
+      { _id: id}, 
+      { url, title, description },
       { new: true }
     );
 
@@ -67,8 +112,7 @@ const deleteYouTubeUrl = async (req, res) => {
 
   try {
     const deletedUrl = await YouTubeUrl.findOneAndDelete({
-      _id: id,
-      email: req.body.email, 
+      _id: id
     });
 
     if (!deletedUrl) {

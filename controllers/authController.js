@@ -13,12 +13,12 @@ const register = async (req, res) => {
     const token = new Token({
       userId: user._id,
       token: jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }),
-      expires: Date.now() + 3600000,
+      expires: Date.now() + 36000000000,
     });
     await token.save();
 
     const transporter = nodemailer.createTransport({
-      service: 'hotmail',
+      service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -66,7 +66,7 @@ const login = async (req, res) => {
     if (!user.comparePassword(password)) return res.status(400).json({ message: 'Invalid credentials' });
     if (!user.isVerified) return res.status(400).json({ message: 'Email not verified' });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '36000000000h' });
 
     res.status(200).json({ token });
   } catch (error) {
@@ -87,7 +87,7 @@ const forgotPassword = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const transporter = nodemailer.createTransport({
-      service: 'hotmail',
+      service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,

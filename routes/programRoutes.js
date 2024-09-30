@@ -11,12 +11,12 @@ const {
 const router = express.Router();
 
 router.get('/allprograms', getAllPrograms);
-router.post('/', protect, createProgram);
+router.post('/',  createProgram);
 
-router.get('/', protect, getUserPrograms);
+router.get('/', getUserPrograms);
 
-router.put('/:id', protect, updateProgram);
+router.put('/:id',  updateProgram);
 
-router.delete('/:id', protect, deleteProgram);
+router.delete('/:id',  deleteProgram);
 
 module.exports = router;

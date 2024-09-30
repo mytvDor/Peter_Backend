@@ -9,11 +9,11 @@ const {
 
 const router = express.Router();
 router.get('/allurls', getAllYouTubeUrls);
-router.post('/', protect, createYouTubeUrl);
+router.post('/',  createYouTubeUrl);
 
 router.get('/', protect, getUserYouTubeUrls);
 
-router.put('/:id', protect, updateYouTubeUrl);
+router.put('/:id', updateYouTubeUrl);
 
 router.delete('/:id', protect, deleteYouTubeUrl);
 module.exports = router;

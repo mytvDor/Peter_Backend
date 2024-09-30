@@ -12,14 +12,13 @@ const getAllPrograms = async (req, res) => {
 
 const createProgram = async (req, res) => {
   const { title, description, price } = req.body;
-
-  if (!title || !description || !price) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
+// console.log(req.body)
+  // if (!title || !description || !price) {
+  //   return res.status(400).json({ message: 'All fields are required' });
+  // }
 
   try {
     const newProgram = new Program({
-      email: req.body.email, 
       title,
       description,
       price,
@@ -50,7 +49,7 @@ const updateProgram = async (req, res) => {
 
   try {
     const updatedProgram = await Program.findOneAndUpdate(
-      { _id: id, email: req.body.email }, 
+      { _id: id }, 
       { title, description, price },
       { new: true }
     );
@@ -71,7 +70,6 @@ const deleteProgram = async (req, res) => {
   try {
     const deletedProgram = await Program.findOneAndDelete({
       _id: id,
-      email: req.body.email, 
     });
 
     if (!deletedProgram) {
