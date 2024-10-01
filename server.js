@@ -82,6 +82,10 @@ const userSchema = new mongoose.Schema({
 });
 
 // Utility functions for password hashing and verification
+
+const User = mongoose.model('users', userSchema);
+
+// Utility functions for password hashing and verification
 const hashPassword = (password) => {
     const salt = crypto.randomBytes(16).toString('hex');
     const hashedPassword = `${salt}$${crypto.createHmac('sha256', salt).update(password).digest('hex')}`;
@@ -100,8 +104,6 @@ userSchema.pre('save', function (next) {
     this.password = hashPassword(this.password); // Use the utility function
     next();
 });
-
-const User = mongoose.model('Users', userSchema);
 
 // Utility function to send emails
 const sendEmail = async (email, subject, text) => {
@@ -139,16 +141,24 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Sign-up route
+// Sign-up route
 app.post('/api/auth/signup', async (req, res) => {
     const { name, email, password } = req.body;
+    console.log(req.body)
     try {
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ msg: 'User already exists' });
+        console.log("pass 1")
 
         const otp = crypto.randomInt(100000, 999999).toString();
         const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        user = new User({ name, email, password, otp, otpExpire });
+        // Hash the password here
+        const hashedPassword = hashPassword(password);
+
+        // Assign the hashed password to the user object
+        user = new User({ name, email, password: hashedPassword, otp, otpExpire });
+
         await user.save();
 
         await sendEmail(user.email, 'Email Verification', `Your OTP is ${otp}`);
@@ -158,6 +168,7 @@ app.post('/api/auth/signup', async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 });
+
 
 // Verify email with OTP route
 app.post('/api/auth/verify-email', async (req, res) => {
@@ -181,15 +192,13 @@ app.post('/api/auth/verify-email', async (req, res) => {
 app.post('/api/auth/signin', async (req, res) => {
     const { email, password } = req.body;
     try {
-        console.log(email, password)
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ msg: 'User not found' });
         if (!user.isVerified) return res.status(400).json({ msg: 'Please verify your email' });
 
-        // Use the verifyPassword utility function
         if (!verifyPassword(password, user.password)) return res.status(400).json({ msg: 'Invalid credentials' });
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '10000h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '10h' });
         res.status(200).json({ token });
     } catch (error) {
         res.status(500).json({ msg: 'Server error' });
@@ -225,7 +234,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
         const user = await User.findOne({ email, otp, otpExpire: { $gt: Date.now() } });
         if (!user) return res.status(400).json({ msg: 'Invalid or expired OTP' });
 
-        user.password = hashPassword(newPassword); // Use the utility function
+        user.password = hashPassword(newPassword); // Use the utility function to hash the new password
         user.otp = undefined; // Clear OTP and expiration
         user.otpExpire = undefined;
         await user.save();
@@ -245,9 +254,10 @@ app.post('/api/auth/protected', authenticateToken, (req, res) => {
 app.post('/api/auth/signout', (req, res) => {
     res.status(200).json({ msg: 'Signed out' });
 });
+
 //auth
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+// app.use('/api/auth', authRoutes);
+// app.use('/api/users', userRoutes);
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/programs', programRoutes); 
 
