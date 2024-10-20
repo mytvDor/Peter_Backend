@@ -15,5 +15,5 @@ router.get('/', protect, getUserYouTubeUrls);
 
 router.put('/:id', updateYouTubeUrl);
 
-router.delete('/:id', protect, deleteYouTubeUrl);
+router.delete('/:id',  deleteYouTubeUrl);
 module.exports = router;
